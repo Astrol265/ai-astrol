@@ -1,0 +1,12 @@
+{
+  "name": "astro-signals",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Astro Signals with real market data and Gemini AI",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

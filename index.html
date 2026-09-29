@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050b18">
+<title>Astro Signals</title>
+<style>
+:root{--bg:#050b18;--panel:#0b172b;--panel2:#101f38;--border:#213957;--text:#edf5ff;--muted:#91a6c0;--blue:#3da5ff;--green:#35dc8f;--red:#ff5f72;--yellow:#ffca55}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font:14px Inter,Arial,sans-serif;background:radial-gradient(circle at top right,#15365c 0,transparent 32%),radial-gradient(circle at bottom left,#0a2340 0,transparent 35%),var(--bg)}
+button,select,input{font:inherit}.app{width:min(1180px,94%);margin:auto;padding:14px 0 36px}
+.header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.logoArea{display:flex;align-items:center;gap:10px}.logo{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#16528b,#08182e);border:1px solid var(--border);font-size:24px}h1{margin:0;font-size:23px}.subtitle,.clock{color:var(--muted);font-size:11px;margin-top:3px}.clock{color:var(--blue)}.status{padding:7px 11px;border-radius:50px;color:var(--green);background:#08251d;border:1px solid #1b6148;font-size:10px}
+.grid{display:grid;grid-template-columns:1.45fr .85fr;gap:13px}.card{background:rgba(11,23,43,.96);border:1px solid var(--border);border-radius:16px;padding:15px;box-shadow:0 12px 40px rgba(0,0,0,.14)}.title{font-size:14px;font-weight:800;margin-bottom:12px}
+.signalHeader{display:flex;justify-content:space-between;align-items:center}.assetName{font-size:20px;font-weight:800}.assetPrice{color:var(--muted);font-size:11px;margin-top:3px}.signalStatus{color:var(--green);font-size:10px;text-align:right}
+.signalBox{margin-top:14px;padding:22px;text-align:center;border-radius:16px;background:linear-gradient(145deg,#102f50,#09182c);border:1px solid #214769}.signalEmoji{font-size:34px}.direction{font-size:40px;font-weight:900;margin:2px 0 5px}.up{color:var(--green)}.down{color:var(--red)}.modelScore{color:var(--muted);font-size:11px}.modelScore strong{color:var(--text)}.progress{height:7px;background:#182b45;border-radius:20px;overflow:hidden;margin-top:9px}.progressFill{height:100%;background:linear-gradient(90deg,#2279c5,#65b7ff);transition:.4s}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.metric,.stat{background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:9px}.metric small,.statLabel{display:block;color:var(--muted);font-size:9px}.metric strong{display:block;margin-top:4px;font-size:11px}
+.tradeState{margin-top:13px;padding:13px;border-radius:13px;background:var(--panel2);border:1px solid var(--border);text-align:center}.stateLabel{color:var(--muted);font-size:10px}.stateText{font-size:16px;font-weight:800;margin-top:4px}.tradeTimer{font-size:28px;font-weight:900;color:var(--yellow);letter-spacing:2px;margin-top:3px}.stateInfo{color:var(--muted);font-size:10px;margin-top:4px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}select,button{width:100%;min-height:44px;border-radius:10px}select{background:#0c1c31;color:white;border:1px solid var(--border);padding:0 9px}button{border:0;color:white;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#1763a0,#124977)}button:disabled{opacity:.45;cursor:not-allowed}
+.ranking{margin-top:13px}.scannerHeader{display:flex;justify-content:space-between;align-items:center}.liveBadge{color:var(--green);font-size:9px}.scannerNote{color:var(--muted);font-size:9px;line-height:1.5;margin-bottom:7px}.rankRow{display:grid;grid-template-columns:28px 1fr 62px;gap:7px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}.rankNumber{color:var(--muted);font-size:10px}.rankName{font-size:11px;font-weight:800}.rankSub{color:var(--muted);font-size:9px;margin-top:2px}.rankBar{height:4px;background:#172a42;border-radius:20px;overflow:hidden;margin-top:5px}.rankFill{height:100%;background:linear-gradient(90deg,#207bc5,#62b3ff)}.rankScore{color:var(--green);font-size:11px;font-weight:800;text-align:right}
+.chat{max-height:450px;overflow-y:auto}.message{padding:10px;border-radius:11px;margin-bottom:8px;line-height:1.5;font-size:11px}.ai{background:#102945;border:1px solid #1d4165}.success{background:#0b3c2b;border:1px solid #1c6047}.warning{background:#302711;border:1px solid #665320}.loss{background:#421c27;border:1px solid #713040}.user{background:#183a61;margin-left:20px}
+.history{margin-top:13px}.historyRow{display:grid;grid-template-columns:1.4fr .6fr .8fr;gap:7px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:11px}.historyTime{display:block;color:var(--muted);font-size:9px;margin-top:2px}.badge{padding:4px 7px;border-radius:20px;text-align:center;font-size:9px}.badge.up{background:#0b3829;color:var(--green)}.badge.down{background:#3a1b25;color:var(--red)}.win{color:var(--green)}.lossText{color:var(--red)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.statNumber{font-size:20px;font-weight:800}.notice{color:var(--muted);font-size:9px;line-height:1.6;text-align:center;margin-top:13px}
+.notification{position:fixed;left:50%;bottom:20px;transform:translate(-50%,150px);width:min(420px,90%);background:#102945;border:1px solid #2a5d89;border-radius:13px;padding:12px;box-shadow:0 15px 50px rgba(0,0,0,.45);transition:.3s;z-index:100}.notification.show{transform:translate(-50%,0)}.notificationTitle{font-weight:800}.notificationText{color:var(--muted);font-size:11px;margin-top:3px}
+@media(max-width:760px){.app{width:96%;padding-top:10px}.grid{grid-template-columns:1fr}.header{align-items:flex-start}.status{display:none}.card{padding:13px;border-radius:14px}.metrics{grid-template-columns:repeat(2,1fr)}.direction{font-size:36px}.controls{grid-template-columns:1fr}.chat{max-height:330px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+<div class="logoArea"><div class="logo">🌌</div><div><h1>Astro Signals</h1><div class="subtitle">Live market analysis assistant</div><div class="clock" id="clock">--:--:--</div></div></div>
+<div class="status" id="connection">● CONNECTING</div>
+</header>
+
+<div class="grid"><main>
+<div class="card">
+<div class="signalHeader"><div><div class="assetName" id="assetName">Loading…</div><div class="assetPrice" id="assetPrice">Getting live market data…</div></div><div class="signalStatus" id="signalStatus">● LIVE DATA</div></div>
+<div class="signalBox"><div class="signalEmoji" id="signalEmoji">🔎</div><div class="direction" id="direction">SCANNING</div><div class="modelScore">Model confidence: <strong id="score">--</strong></div><div class="progress"><div class="progressFill" id="progress" style="width:0"></div></div></div>
+<div class="metrics">
+<div class="metric"><small>Momentum</small><strong id="momentum">--</strong></div><div class="metric"><small>Trend</small><strong id="trend">--</strong></div><div class="metric"><small>Volatility</small><strong id="volatility">--</strong></div><div class="metric"><small>Data quality</small><strong id="payout">--</strong></div>
+</div>
+<div class="tradeState"><div class="stateLabel">CURRENT STATUS</div><div class="stateText" id="stateText">Preparing…</div><div class="tradeTimer" id="tradeTimer">05:00</div><div class="stateInfo" id="stateInfo">Persistent clock</div></div>
+<div class="controls">
+<select id="assetSelect"><option value="AUTO">🤖 AUTO — Highest Data Score</option></select><button id="scanButton">🔎 SCAN LIVE MARKETS</button>
+</div>
+</div>
+
+<div class="card ranking"><div class="scannerHeader"><div class="title">🧠 Live Market Scanner</div><div class="liveBadge">● LIVE</div></div><div class="scannerNote">Rankings use fresh prices and technical features from the server. OTC instruments are not presented as live unless a genuine feed is available.</div><div id="ranking"></div></div>
+
+<div class="card history"><div class="title">📊 Completed Signals</div><div id="historyList">No completed signals yet.</div></div>
+</main>
+
+<aside>
+<div class="card"><div class="title">🤖 Astro AI</div><div class="chat" id="chat">
+<div class="message ai">Astro AI is connected to the server. It receives the latest market snapshot before answering, and it is instructed not to invent prices, indicators, news or probabilities.</div>
+<div class="message warning">⚠️ A model confidence score is not a guaranteed chance of winning. Market data can be delayed or unavailable.</div>
+</div></div>
+<div class="card" style="margin-top:13px"><div class="title">📈 Performance</div><div class="stats"><div class="stat"><div class="statNumber" id="total">0</div><div class="statLabel">Completed</div></div><div class="stat"><div class="statNumber win" id="wins">0</div><div class="statLabel">Success</div></div><div class="stat"><div class="statNumber" id="accuracy">0%</div><div class="statLabel">Demo rate</div></div></div></div>
+<div class="card" style="margin-top:13px"><div class="title">💬 Ask Astro AI</div><input id="question" placeholder="e.g. Explain this signal" style="width:100%;height:44px;border-radius:10px;border:1px solid var(--border);background:#0c1c31;color:white;padding:0 10px"><button id="askButton" style="margin-top:8px">ASK AI</button></div>
+</aside></div>
+
+<div class="notice">Live market data is fetched by the server. Gemini answers are grounded in the supplied snapshot. This app does not place trades. Signal outcomes are demo evaluations, not proof of predictive accuracy.</div>
+</div>
+<div class="notification" id="notification"><div class="notificationTitle" id="notificationTitle"></div><div class="notificationText" id="notificationText"></div></div>
+
+<script>
+const TRADE_SECONDS=300,WAIT_SECONDS=180,TIMER_KEY="astroV2Timer",DATA_KEY="astroV2Data",TZ="Etc/GMT+4";
+let state="WAITING",tradeEndTime=null,waitEndTime=null,currentSignal=null,markets=[],history=[],total=0,wins=0;
+
+const $=id=>document.getElementById(id);
+function clock(){return new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}).format(new Date())}
+setInterval(()=>{$("clock").textContent="UTC -4 • "+clock()},1000);$("clock").textContent="UTC -4 • "+clock();
+
+function persist(){localStorage.setItem(TIMER_KEY,JSON.stringify({state,tradeEndTime,waitEndTime,currentSignal}));localStorage.setItem(DATA_KEY,JSON.stringify({history,total,wins}))}
+function restore(){try{let t=JSON.parse(localStorage.getItem(TIMER_KEY)||"null"),d=JSON.parse(localStorage.getItem(DATA_KEY)||"null");if(t){state=t.state||"WAITING";tradeEndTime=t.tradeEndTime||null;waitEndTime=t.waitEndTime||null;currentSignal=t.currentSignal||null}if(d){history=d.history||[];total=d.total||0;wins=d.wins||0;renderHistory();updateStats()}return !!t}catch{return false}}
+function addChat(type,msg){let d=document.createElement("div");d.className="message "+type;d.innerHTML=msg;$("chat").appendChild(d);$("chat").scrollTop=$("chat").scrollHeight}
+function notify(t,m){$("notificationTitle").textContent=t;$("notificationText").textContent=m;$("notification").classList.add("show");setTimeout(()=>$("notification").classList.remove("show"),4500)}
+function updateStats(){$("total").textContent=total;$("wins").textContent=wins;$("accuracy").textContent=(total?Math.round(wins/total*100):0)+"%"}
+function renderHistory(){let box=$("historyList");if(!history.length){box.textContent="No completed signals yet.";return}box.innerHTML=history.slice(0,10).map(x=>`<div class="historyRow"><div><b>${x.emoji||""} ${x.symbol}</b><span class="historyTime">${x.time}</span></div><span class="badge ${x.direction==="UP"?"up":"down"}">${x.direction}</span><span class="${x.success?"win":"lossText"}">${x.success?"✓ SUCCESS":"✕ FAILED"}</span></div>`).join("")}
+function renderMarkets(){let s=$("assetSelect");s.innerHTML='<option value="AUTO">🤖 AUTO — Highest Data Score</option>'+markets.map(m=>`<option value="${m.symbol}">${m.emoji||"•"} ${m.symbol}</option>`).join("");$("ranking").innerHTML=markets.slice(0,5).map((m,i)=>`<div class="rankRow"><div class="rankNumber">#${i+1}</div><div><div class="rankName">${m.emoji||"•"} ${m.symbol}</div><div class="rankSub">${m.direction==="UP"?"📈":"📉"} ${m.direction} • Momentum ${m.momentum}% • Trend ${m.trend}%</div><div class="rankBar"><div class="rankFill" style="width:${m.confidence}%"></div></div></div><div class="rankScore">${m.confidence}%</div></div>`).join("")}
+async function api(path,opts={}){let r=await fetch(path,{...opts,headers:{"Content-Type":"application/json",...(opts.headers||{})}});let j=await r.json();if(!r.ok)throw new Error(j.error||"Server error");return j}
+
+async function scan(){try{$("connection").textContent="● SCANNING";let j=await api("/api/scan");markets=j.markets||[];renderMarkets();if(!markets.length)throw new Error("No live instruments returned");let choice=$("assetSelect").value;let s=choice==="AUTO"?markets[0]:markets.find(x=>x.symbol===choice)||markets[0];startSignal(s);$("connection").textContent="● LIVE DATA"}catch(e){$("connection").textContent="● OFFLINE";addChat("warning","⚠️ "+e.message);notify("Market data unavailable",e.message)}}
+
+function startSignal(s){if(state==="RUNNING")return;currentSignal={...s,time:clock()};$("assetName").textContent=(s.emoji||"•")+" "+s.symbol;$("assetPrice").textContent=`Live price ${s.price} • ${s.change24h>=0?"+":""}${s.change24h}% 24h`;$("signalStatus").textContent="● LIVE DATA";$("signalEmoji").textContent=s.direction==="UP"?"🚀":"🔻";$("direction").textContent=s.direction;$("direction").className="direction "+(s.direction==="UP"?"up":"down");$("score").textContent=s.confidence+"%";$("progress").style.width=s.confidence+"%";$("momentum").textContent=s.momentum+"%";$("trend").textContent=s.trend+"%";$("volatility").textContent=s.volatility+"%";$("payout").textContent=s.dataQuality+"%";state="RUNNING";tradeEndTime=Date.now()+TRADE_SECONDS*1000;waitEndTime=null;persist();$("stateText").textContent="🔴 ANALYSIS WINDOW RUNNING";$("stateText").style.color="var(--yellow)";$("stateInfo").textContent="Started "+currentSignal.time+" • closes in 5 minutes";addChat("ai",`<b>LIVE SIGNAL</b><br><br>${s.emoji||""} <b>${s.symbol}</b> • <b>${s.direction}</b><br>Confidence: <b>${s.confidence}%</b><br>Price: <b>${s.price}</b><br>Momentum: ${s.momentum}% • Trend: ${s.trend}% • Volatility: ${s.volatility}%<br><br>Data quality: ${s.dataQuality}%. This is analysis, not a guaranteed outcome.`)}
+
+async function complete(){if(!currentSignal){state="WAITING";waitEndTime=Date.now()+WAIT_SECONDS*1000;persist();return}try{let j=await api("/api/evaluate",{method:"POST",body:JSON.stringify({signal:currentSignal})});let success=!!j.success;total++;if(success)wins++;history.unshift({...currentSignal,success,time:currentSignal.time});history=history.slice(0,50);updateStats();renderHistory();addChat(success?"success":"loss",`<b>5-MINUTE DEMO EVALUATION</b><br><br>${currentSignal.emoji||""} ${currentSignal.symbol}<br>Signal: <b>${currentSignal.direction}</b><br><br>${success?"✅":"❌"} Result: <b>${success?"SUCCESS":"UNSUCCESSFUL"}</b><br><small>Evaluation uses subsequent market data; it is not a guarantee of predictive performance.</small>`);state="WAITING";tradeEndTime=null;waitEndTime=Date.now()+WAIT_SECONDS*1000;currentSignal=null;persist();notify("Signal completed",success?"Demo evaluation: SUCCESS":"Demo evaluation: UNSUCCESSFUL")}catch(e){addChat("warning","⚠️ Could not evaluate the completed signal: "+e.message);state="WAITING";tradeEndTime=null;waitEndTime=Date.now()+WAIT_SECONDS*1000;persist()}}
+
+function tick(){let now=Date.now();if(state==="RUNNING"){let r=Math.max(0,Math.ceil((tradeEndTime-now)/1000));$("tradeTimer").textContent=fmt(r);if(r<=0)complete()}else{if(!waitEndTime){waitEndTime=now+WAIT_SECONDS*1000;persist()}let r=Math.max(0,Math.ceil((waitEndTime-now)/1000));$("tradeTimer").textContent=fmt(r);$("stateText").textContent="⏳ WAITING FOR NEXT SCAN";$("stateText").style.color="var(--blue)";$("stateInfo").textContent="The countdown uses an absolute timestamp and continues while the page is closed.";if(r<=0){waitEndTime=null;persist();scan()}}}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")}
+
+$("scanButton").onclick=()=>{if(state==="RUNNING"){addChat("warning","⏳ The current 5-minute analysis window is still running.");return}scan()};
+$("assetSelect").onchange=()=>{if(state==="RUNNING"){addChat("warning","⚠️ Finish the current analysis window before switching the active instrument.");return}let s=markets.find(x=>x.symbol===$("assetSelect").value);if(s)startSignal(s)};
+$("askButton").onclick=async()=>{let q=$("question").value.trim();if(!q)return;addChat("user",q);$("question").value="";try{let j=await api("/api/chat",{method:"POST",body:JSON.stringify({question:q,markets:markets.slice(0,10),signal:currentSignal})});addChat("ai",j.answer)}catch(e){addChat("warning","⚠️ "+e.message)}};
+
+restore();setInterval(tick,1000);tick();if(!markets.length)scan();
+</script>
+</body>
+</html>
